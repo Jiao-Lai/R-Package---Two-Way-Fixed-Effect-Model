@@ -1,1 +1,0 @@
-# R-Package---Two-Way-Fixed-Effect-Model
