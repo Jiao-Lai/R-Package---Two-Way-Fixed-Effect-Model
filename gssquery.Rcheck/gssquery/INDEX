@@ -1,0 +1,15 @@
+Analysis.lm             Linear regression of fixed effect model.
+GSS                     Data on household happiness, income and other
+                        characteristics from 'gss.norc.org'.
+GetAttributes           Get all attributes in given data.
+GetCleanLmData          Get subset data containing certain attributes,
+                        which can be used for analyses such as linear
+                        regressions.
+LagEffect               Event study: lag effect.
+LeadEffect              Event study: lead effect.
+PlaceboLOU              Placebo test: leave one out.
+PlaceboTSReshuffle      Placebo test on effect of x on y.
+PlotAttribute           Plot of specific attribute of data.
+QueryAttributes         Query specific attributes from data.
+gssquery                A package which can perform fixed effect model
+                        and robustness test.
