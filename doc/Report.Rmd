@@ -1,0 +1,169 @@
+---
+title: "Package gssquery"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{introduction}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>"
+)
+```
+
+```{r setup}
+library(gssquery)
+```
+1. What the package does?
+
+This package can be used to perform fixed effect model where the treatment status is an indicator with two levels, and outcome variable is numeric. Compared to random effect model, a fixed effect model allows one to control for time-invariant unobserved individual characteristics that can be correlated with the observed independent variables. This model is commonly used in Economics especially in the field of health economics. 
+
+Further analyses can be also performed to check the robustness of the main effect. Specifically, event study is included to check if there is a lag or lead of the main effect. In addition, falsification exercises (1) leave one out is included to test the sensitivity of the main effect to subset of sample; (2) random treatment status reshuffling is included to test the sensitivity of the main effect to treatment status reshuffling.
+
+Non-quantitative functions such as get attributes, query attributes, plot attribute of a given data is also included.
+
+Deviation from proposal: The proposed design of this package is for GSS specifically. The final package can be used for any data with similar structure.
+
+
+2. Use cases.
+
+Gerneral Social Survey (GSS) data from `gss.norc.org` is included in this package to test its applicability. The raw data is pre-processed as in "/data-raw/GSS.R" to fit the package use, as the raw data is annually, not panel. 
+
+The package can be used to test if US presidential election affects household happiness. The corresponding data for this case is included in `GSS.rda`.
+
+The corresponding arguments using data GSS are:
+
+y: outcome variable, which is `happy.score` evaluating how happy a household is.
+x: treatment variable, which is `election`, or `re.election`.
+FE: fixed effects, which is `year`.
+time: time fixed effect, which is `year`.
+out: group variable indicating subgroup to be dropped, which can be any attribute.
+
+
+2.1. The data `GSS` contains hundreds of attributes. Function `GerAttributes` can be used to show attribute names, so that the user can decide which attribute is useful. 
+
+```{r}
+data(GSS)
+GetAttributes(data = GSS)
+```
+For the above effect, related variables are outcome variable `happy.score`, treatment variable `election` which takes value for election years and 0 otherwise, and `re.election` which takes value 2 for re-election years，1 for other election years and 0 otherwise, time fixed effect `year`, and household characteristics affecting election, such as `age`, `income`, `health`, `educ`.
+
+
+2.2. The function QueryAttributes can be used to query any attribute of interest. 
+
+```{r}
+query<-QueryAttributes(data = GSS,'happy','health','income')
+head(query)
+```
+
+2.3. The function `GetCleanLmData` can be used to get attributes of interest, which is cleaned by replacing any value with nonsense by NA. Since `GSS` is a survey data, this is a common issue. The data has to be cleaned before running any quantitative analyses.
+
+```{r}
+LmData <- GetCleanLmData(data = GSS, y = 'happy.score', x = 'election', FE = 'year', common.na.strings = c("DK", "IAP", "UNCODEABLE & IAP", ".a", ".b","DK NA"), 'age', 'income', 'health', 'educ')
+head(LmData)
+LmData.reelec <- GetCleanLmData(data = GSS[GSS$re.election != 1,], y = 'happy.score', x = 're.election', FE = 'year', common.na.strings = c("DK", "IAP", "UNCODEABLE & IAP", ".a", ".b","DK NA"), 'age', 'income', 'health', 'educ')
+head(LmData.reelec)
+LmData.elec <- GetCleanLmData(data = GSS[GSS$re.election != 2,], y = 'happy.score', x = 're.election', FE = 'year', common.na.strings = c("DK", "IAP", "UNCODEABLE & IAP", ".a", ".b","DK NA"), 'age', 'income', 'health', 'educ')
+head(LmData.elec)
+```
+
+2.4. The data returned from `GetCleanLmData` can be used for quantitative analyses.
+
+2.4.1. The function `Analysis.lm` can be used to perform fixed effect model, with selected fixed effect, and other control variables.
+
+```{r}
+library(dplyr)
+LmData <- LmData %>% mutate(age = as.numeric(age)) %>% filter(age<=60)
+summary(Analysis.lm(data = LmData, y = 'happy.score', FE = 'year'))
+
+```
+The results indicate households on average are happier by 0.077 in election years (campaign for brand new presidents or re-election) compared to non-election years.
+
+```{r}
+LmData.reelec <- LmData.reelec %>% mutate(age = as.numeric(age)) %>% filter(age<=60)
+summary(Analysis.lm(data = LmData.reelec, y = 'happy.score', FE = 'year'))
+
+```
+The results indicate households on average are happier by 0.55 in re-election years compared to  non-election years.
+
+```{r}
+LmData.elec <- LmData.elec %>% mutate(age = as.numeric(age)) %>% filter(age<=60)
+summary(Analysis.lm(data = LmData.elec, y = 'happy.score', FE = 'year'))
+```
+The results indicate households on average are happier by 0.077 in elections years (campaign for brand new presidents) compared to non-election years.
+
+
+2.4.2. The function `LagEffect` can be used to check if there is a lag effect.
+
+```{r}
+LagEffect(data = LmData, y = 'happy.score', x = 'election', time = 'year', FE = 'year')
+
+
+```
+The results indicate the election (for brand new presidents or re-election) causes households to be less happy by 1.04 two years later.
+
+```{r}
+LagEffect(data = LmData.elec, y = 'happy.score', x = 're.election', time = 'year', FE = 'year')
+
+```
+The results indicate the election (for brand new presidents) causes households to be less happy by 1.04 two years later.
+```{r}
+LagEffect(data = LmData.reelec, y = 'happy.score', x = 're.election', time = 'year', FE = 'year')
+
+```
+The results indicate the re-election causes households to be happier by 0.37 two years later.
+
+
+2.4.3. The function `LeadEffect` can be used to check if there is lead effect.
+
+```{r}
+LeadEffect(data = LmData, y = 'happy.score', x = 'election', time = 'year', FE = 'year')
+
+```
+The results indicate household happiness in two years before the election has no statistically difference between election (for brand new president or re-election) years and non-election years .
+
+```{r}
+LeadEffect(data = LmData.elec, y = 'happy.score', x = 're.election', time = 'year', FE = 'year')
+```
+The results indicate household happiness in two years before the election has no statistically difference between election (for brand new president) years and non-election years .
+
+
+```{r}
+LeadEffect(data = LmData.reelec, y = 'happy.score', x = 're.election', time = 'year', FE = 'year')
+
+```
+The results indicate households are less happy by 0.55 two years before re-election.
+
+2.4.4. The function `PlaceboTSReshuffle` can be used to check if the effect from original treatment status is an outlier from random reshuffling of treatment status. If the effect is truely a causal effect, then the coefficient from original treatment status should stand out.
+
+```{r}
+PlaceboTSReshuffle(data = LmData, y = 'happy.score', x = 'election', FE = 'year')
+PlaceboTSReshuffle(data = LmData.elec, y = 'happy.score', x = 're.election', FE = 'year')
+PlaceboTSReshuffle(data = LmData.reelec, y = 'happy.score', x = 're.election', FE = 'year')
+
+
+```
+The graph suggests that only the effect of re-election on household happiness passed this falsification exercise since the red dot is an outlier
+
+2.4.5. The function `PlaceboLOU` can be used to check if the main effect is sensitive to subset of sample. The argument `out` specifies group variable. For example, `out = "year"`, then the main effect will be re-examined for sub sample where one year is droped.
+
+```{r}
+PlaceboLOU(data = LmData, y = 'happy.score', x = 'election', FE = 'year', out = 'year')
+PlaceboLOU(data = LmData.elec, y = 'happy.score', x = 're.election', FE = 'year', out = 'year')
+PlaceboLOU(data = LmData.reelec, y = 'happy.score', x = 're.election', FE = 'year', out = 'year')
+
+```
+The results indicate that the direction of the effect of US presidential re-election on household happiness is reversed after dropping year 2002. And the effect of US presidential election on household happiness is much larger after dropping year 2000.
+
+
+2.5. The function `PlotAttribute` can be used to plot a chosen attribute with given group variable. GSS data are almost all categorical with level fewer than 15, so the function does a bar plot by year group. For a small exceptions like `age`, this function plot the mean by group.
+
+This visualization shows the trend (sample distribution) of attribute. 
+
+```{r}
+PlotAttribute(data = GSS, attr = "happy", group.by = "year")
+PlotAttribute(data = GSS, attr = "age", group.by = "year")
+```
