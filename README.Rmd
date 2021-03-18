@@ -1,5 +1,3 @@
-Stats 290 Final Project: gssquery
-Author: Jiao Lai SUID# 06406648
 
 Proposal of the package:
 1. What is your package trying to achieve?  Who is it aimed at?
