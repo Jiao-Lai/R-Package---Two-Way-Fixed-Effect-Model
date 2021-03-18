@@ -1,0 +1,58 @@
+Stats 290 Final Project: gssquery
+Author: Jiao Lai SUID# 06406648
+
+Proposal of the package:
+1. What is your package trying to achieve?  Who is it aimed at?
+
+```q1
+
+1.  Querying.  The package will enable users to query the General Social Survey (GSS) data from http://gss.norc.org containing data on contemporary American society. The users could query certain attitudes, behaviors, and attributes.
+
+2.  Visualization.  The package will also provide tools to
+visualize the trends of variables of interest, such as age, ethnic, happy, income.
+
+3.  Analysis.  It will also include functions to analyze
+if 1) the level of happiness differs in election years vs non_election years, 2) if the level of happiness differs in election years vs re-election years, 3) if there is any lead or lag effect of the above relationship.
+
+The package is aimed at research institutions, analysts and sociologist, politicians.
+
+```
+
+2. Briefly describe the background if that's not obvious.  What field
+   or area of interest is it related to?  (Just briefly, in a paragraph
+   or two, maximum.) References, including web references, are welcome
+   where available.
+
+```q2
+
+Political uncertainty like presidential election is broadly documented to affect economic activities, and firm behaviors. This package is inspired by the idea that political uncertainty may also have effect on individuals/households, like happiness. New policies are generally accomopanied with the on board of new presidents. The policies will harm some people while benefit some others. 
+```
+
+3. Provide one or two use cases; that is, in a sentence or so say how
+   you see someone using the package.
+
+```q3
+
+Sociolgogists will query the R package for attributes of interest. The queries will allow them to pass arguments.
+
+Scientists can also visualize the trends of variables they are interested.
+
+Scientists will also be able to utilize the analytical functions to
+discover assocations between presidential election and household happiness.
+
+Politicians can utilize the analytical functions to discover the above associations and take actions to reduce the negative effect (if any) of presidential elections.
+
+```
+
+4. If you can, list the main functions or other software you plan on
+   including.  No need to implement anything now, but you should have
+   an idea.
+
+```q4
+
+The R package will provide the following functions: reading,
+writing, and cleaning data, creating graphs and visualizations, running parameterized queries against datasets, providing for download
+capabilibities of both data and graphics. The R package will also
+provide functions for deeper analysis by the user.
+
+```
