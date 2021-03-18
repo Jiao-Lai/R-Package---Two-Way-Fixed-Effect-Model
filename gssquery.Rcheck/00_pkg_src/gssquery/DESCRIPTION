@@ -1,0 +1,19 @@
+Package: gssquery
+Title: Final Project for Stats 290
+Version: 1.0
+Authors@R: person("Jiao","Lai", role = c("aut", "cre"), email = "emmalai@stanford.edu")
+Maintainer: Jiao Lai <emmalai@stanford.edu>
+Description: This is a package for project of stat290. This package can be used to test the effect
+              of US presidential elections on household happiness. Event study is exexuted for lead and lag
+              effects. Placebo test is provided.
+Depends: R (>= 3.1.0)
+License: GPL-2
+Encoding: UTF-8
+LazyData: true
+RoxygenNote: 7.0.2
+Imports: dplyr, tidyr, ggplot2, magrittr, rlang
+Suggests: knitr, rmarkdown
+VignetteBuilder: knitr
+NeedsCompilation: no
+Packaged: 2020-03-13 23:07:54 UTC; jiaolai
+Author: Jiao Lai [aut, cre]
